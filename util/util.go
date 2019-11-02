@@ -1,6 +1,8 @@
 package util
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
@@ -21,4 +23,15 @@ func StringToArray(str string, delim string) []int {
 	}
 
 	return res
+}
+
+func Sha256(bz []byte) []byte {
+	h := sha256.New()
+	h.Write(bz)
+	return h.Sum(nil)
+}
+
+func Byte2Hex(data []byte) string {
+	str := hex.EncodeToString(data)
+	return str
 }

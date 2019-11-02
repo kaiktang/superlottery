@@ -11,8 +11,9 @@ import (
 import abci "github.com/tendermint/tendermint/abci/types"
 
 const (
-	QueryLottery   = "lottery"
-	QueryLotteries = "lotteries"
+	QueryLottery    = "lottery"
+	QueryLotteries  = "lotteries"
+	QueryCandidates = "candidates"
 )
 
 var logger = util.GetLogger("keeper")
@@ -22,6 +23,9 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		logger.Info("querier receive path: " + strings.Join(path, "*"))
 		switch path[0] {
 		case QueryLottery:
+			if len(path) > 2 && path[1] == QueryCandidates {
+				return queryCandidates(ctx, path[2:], req, keeper)
+			}
 			return queryLottery(ctx, path[1:], req, keeper)
 		case QueryLotteries:
 			return queryLotteries(ctx, req, keeper)
@@ -59,6 +63,18 @@ func queryLottery(ctx sdk.Context, path []string, req abci.RequestQuery, keeper 
 	}
 
 	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryLottery{Lottery: *lottery})
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return res, nil
+}
+
+func queryCandidates(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	lotteryID := path[0]
+	candidates := keeper.GetCandidates(ctx, lotteryID)
+
+	res, err := codec.MarshalJSONIndent(keeper.cdc, candidates)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}

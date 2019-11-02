@@ -3,7 +3,10 @@ package types
 const (
 	ModuleName = "lotteryservice"
 
-	StoreKey      = ModuleName
-	LotteryPrefix = "lottery_"
-	LotteryCandidatesStoreKey
+	StoreKey = ModuleName
+
+	// can't share the same prefix
+	LotteryPrefix           = "lottery_"
+	LotteryIDKey            = "id"
+	LotteryCandidatesPrefix = "candidates_"
 )

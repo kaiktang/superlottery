@@ -5,3 +5,5 @@ type QueryLottery struct {
 }
 
 type QueryLotteries []Lottery
+
+type QueryCandidates Candidates

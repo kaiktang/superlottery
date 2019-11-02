@@ -15,7 +15,7 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) 
 	r.HandleFunc(fmt.Sprintf("/%s/lottery", storeName), createLotteryHandler(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/lotteries", storeName), getLotteriesHandler(cliCtx, storeName)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/lottery/{%s}", storeName, lotteryID), getLotteryHandler(cliCtx, storeName)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/lottery/{%s}/candidates", storeName, lotteryID), getCandidatesHandler(cliCtx, storeName)).Methods("GET")
 	//r.HandleFunc(fmt.Sprintf("/%s/lottery/{%s}/whois", storeName, restName), whoIsHandler(cliCtx, storeName)).Methods("GET")
 	//r.HandleFunc(fmt.Sprintf("/%s/lottery", storeName), deleteNameHandler(cliCtx)).Methods("DELETE")
 }
-

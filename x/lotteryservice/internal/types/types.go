@@ -5,19 +5,8 @@ import (
 	"github.com/TomKKlalala/superchainer/util"
 	"strconv"
 	"strings"
-	"sync"
 )
 import sdk "github.com/cosmos/cosmos-sdk/types"
-
-var lotteryID int64
-var lock sync.Mutex
-
-func LotteryID() string {
-	lock.Lock()
-	defer lock.Unlock()
-	lotteryID++
-	return strconv.FormatInt(lotteryID, 10)
-}
 
 type Lottery struct {
 	ID           string         `json:"id"`
@@ -28,6 +17,7 @@ type Lottery struct {
 	Hashed       bool           `json:"hashed"`
 	StopEnroll   bool           `json:"stopEnroll"`
 	CurrentRound int            `json:"currentRound"`
+	CandidateNum int            `json:"candidateNum"`
 }
 
 func NewLottery() Lottery {
@@ -43,7 +33,8 @@ Owner: %s
 Rounds: %s
 Hashed: %s
 StopEnroll: %s
-CurrentRound: %d`,
+CurrentRound: %d
+CandidateNum:`,
 		lottery.ID,
 		lottery.Title,
 		lottery.Description,
@@ -51,7 +42,8 @@ CurrentRound: %d`,
 		util.ArrayToString(lottery.Rounds, ","),
 		strconv.FormatBool(lottery.Hashed),
 		strconv.FormatBool(lottery.StopEnroll),
-		lottery.CurrentRound))
+		lottery.CurrentRound),
+	)
 }
 
 // TODO: 还需要表示每轮抽中人数

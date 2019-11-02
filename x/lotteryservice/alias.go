@@ -14,7 +14,8 @@ const (
 var (
 	NewKeeper           = keeper.NewKeeper
 	NewMsgCreateLottery = types.NewMsgCreateLottery
-	NewQuerier       = keeper.NewQuerier
+	NewAddCandidates    = types.NewMsgAddCandidates
+	NewQuerier          = keeper.NewQuerier
 	//NewMsgBuyName    = types.NewMsgBuyName
 	//NewMsgSetName    = types.NewMsgSetName
 	//NewMsgDeleteName = types.NewMsgDeleteName
