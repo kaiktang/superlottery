@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"github.com/TomKKlalala/superchainer/x/lotteryservice"
 	"os"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -24,18 +25,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-
-	"github.com/cosmos/sdk-tutorials/nameservice/x/nameservice"
 )
 
-const appName = "nameservice"
+const appName = "lotteryservice"
 
 var (
 	// default home directories for the application CLI
-	DefaultCLIHome = os.ExpandEnv("$HOME/.nscli")
+	DefaultCLIHome = os.ExpandEnv("$HOME/.lscli")
 
 	// DefaultNodeHome sets the folder where the applcation data and configuration will be stored
-	DefaultNodeHome = os.ExpandEnv("$HOME/.nsd")
+	DefaultNodeHome = os.ExpandEnv("$HOME/.lsd")
 
 	// NewBasicManager is in charge of setting up basic module elemnets
 	ModuleBasics = module.NewBasicManager(
@@ -49,7 +48,7 @@ var (
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
 
-		nameservice.AppModule{},
+		lotteryservice.AppModule{},
 	)
 	// account permissions
 	maccPerms = map[string][]string{
@@ -69,7 +68,7 @@ func MakeCodec() *codec.Codec {
 	return cdc
 }
 
-type nameServiceApp struct {
+type lotteryServiceApp struct {
 	*bam.BaseApp
 	cdc *codec.Codec
 
@@ -85,16 +84,16 @@ type nameServiceApp struct {
 	distrKeeper    distr.Keeper
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
-	nsKeeper       nameservice.Keeper
+	lsKeeper       lotteryservice.Keeper
 
 	// Module Manager
 	mm *module.Manager
 }
 
-// NewNameServiceApp is a constructor function for nameServiceApp
-func NewNameServiceApp(
+// NewLotteryServiceApp is a constructor function for lotteryServiceApp
+func NewLotteryServiceApp(
 	logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp),
-) *nameServiceApp {
+) *lotteryServiceApp {
 
 	// First define the top level codec that will be shared by the different modules
 	cdc := MakeCodec()
@@ -105,12 +104,12 @@ func NewNameServiceApp(
 	bApp.SetAppVersion(version.Version)
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
-		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, nameservice.StoreKey)
+		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, lotteryservice.StoreKey)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
 	// Here you initialize your application with the store keys it requires
-	var app = &nameServiceApp{
+	var app = &lotteryServiceApp{
 		BaseApp: bApp,
 		cdc:     cdc,
 		keys:    keys,
@@ -190,9 +189,8 @@ func NewNameServiceApp(
 
 	// The NameserviceKeeper is the Keeper from the module for this tutorial
 	// It handles interactions with the namestore
-	app.nsKeeper = nameservice.NewKeeper(
-		app.bankKeeper,
-		keys[nameservice.StoreKey],
+	app.lsKeeper = lotteryservice.NewKeeper(
+		keys[lotteryservice.StoreKey],
 		app.cdc,
 	)
 
@@ -201,7 +199,7 @@ func NewNameServiceApp(
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
-		nameservice.NewAppModule(app.nsKeeper, app.bankKeeper),
+		lotteryservice.NewAppModule(app.lsKeeper, app.bankKeeper),
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
@@ -221,7 +219,7 @@ func NewNameServiceApp(
 		auth.ModuleName,
 		bank.ModuleName,
 		slashing.ModuleName,
-		nameservice.ModuleName,
+		lotteryservice.ModuleName,
 		supply.ModuleName,
 		genutil.ModuleName,
 	)
@@ -262,7 +260,7 @@ func NewDefaultGenesisState() GenesisState {
 	return ModuleBasics.DefaultGenesis()
 }
 
-func (app *nameServiceApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *lotteryServiceApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
 
 	err := app.cdc.UnmarshalJSON(req.AppStateBytes, &genesisState)
@@ -273,18 +271,18 @@ func (app *nameServiceApp) InitChainer(ctx sdk.Context, req abci.RequestInitChai
 	return app.mm.InitGenesis(ctx, genesisState)
 }
 
-func (app *nameServiceApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *lotteryServiceApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
-func (app *nameServiceApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *lotteryServiceApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
-func (app *nameServiceApp) LoadHeight(height int64) error {
+func (app *lotteryServiceApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
-func (app *nameServiceApp) ModuleAccountAddrs() map[string]bool {
+func (app *lotteryServiceApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		modAccAddrs[supply.NewModuleAddress(acc).String()] = true
@@ -295,7 +293,7 @@ func (app *nameServiceApp) ModuleAccountAddrs() map[string]bool {
 
 //_________________________________________________________
 
-func (app *nameServiceApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,
+func (app *lotteryServiceApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,
 ) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	// as if they could withdraw from the start of the next block

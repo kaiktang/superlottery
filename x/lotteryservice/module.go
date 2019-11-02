@@ -1,7 +1,9 @@
-package nameservice
+package lotteryservice
 
 import (
 	"encoding/json"
+	"github.com/TomKKlalala/superchainer/x/lotteryservice/client/cli"
+	"github.com/TomKKlalala/superchainer/x/lotteryservice/client/rest"
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
@@ -9,8 +11,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/sdk-tutorials/nameservice/x/nameservice/client/cli"
-	"github.com/cosmos/sdk-tutorials/nameservice/x/nameservice/client/rest"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -67,7 +67,7 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 	keeper     Keeper
-	coinKeeper bank.Keeper
+	//coinKeeper bank.Keeper
 }
 
 // NewAppModule creates a new AppModule Object
@@ -75,7 +75,7 @@ func NewAppModule(k Keeper, bankKeeper bank.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         k,
-		coinKeeper:     bankKeeper,
+		//coinKeeper:     bankKeeper,
 	}
 }
 

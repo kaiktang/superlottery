@@ -4,6 +4,6 @@ const (
 	ModuleName = "lotteryservice"
 
 	StoreKey      = ModuleName
-	LotteryPrefix = "lottery"
+	LotteryPrefix = "lottery_"
 	LotteryCandidatesStoreKey
 )

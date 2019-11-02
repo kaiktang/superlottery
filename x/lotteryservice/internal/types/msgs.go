@@ -5,15 +5,15 @@ import sdk "github.com/cosmos/cosmos-sdk/types"
 const RouterKey = ModuleName
 
 type MsgCreateLottery struct {
-	Rounds      []int64        `json:"rounds"`
+	Rounds      []int          `json:"rounds"`
 	Title       string         `json:"title"`
 	Description string         `json:"description"`
 	Owner       sdk.AccAddress `json:"owner"`
 	Hashed      bool           `json:"hashed"`
 }
 
-func NewMsgCreateLottery(title string, description string, owner sdk.AccAddress, hashed bool) *MsgCreateLottery {
-	return &MsgCreateLottery{Rounds: []int64{}, Title: title, Description: description, Owner: owner, Hashed: hashed}
+func NewMsgCreateLottery(title string, description string, owner sdk.AccAddress, rounds []int, hashed bool) *MsgCreateLottery {
+	return &MsgCreateLottery{Rounds: rounds, Title: title, Description: description, Owner: owner, Hashed: hashed}
 }
 
 // Route should return the name of the module

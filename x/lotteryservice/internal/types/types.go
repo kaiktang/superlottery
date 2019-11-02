@@ -49,7 +49,7 @@ CurrentRound: %d`,
 		strconv.FormatBool(lottery.StopEnroll),
 		lottery.CurrentRound))
 }
-
+// TODO: 还需要表示每轮抽中人数
 type Candidates []string
 
 func (c Candidates) String() string {
