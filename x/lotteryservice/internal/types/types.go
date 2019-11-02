@@ -20,6 +20,7 @@ func LotteryID() string {
 }
 
 type Lottery struct {
+	ID           string         `json:"id"`
 	Rounds       []int          `json:"rounds"`
 	Title        string         `json:"title"`
 	Description  string         `json:"description"`
@@ -34,13 +35,16 @@ func NewLottery() Lottery {
 }
 
 func (lottery Lottery) String() string {
-	return strings.TrimSpace(fmt.Sprintf(`Title: %s
+	return strings.TrimSpace(fmt.Sprintf(`
+ID: %s
+Title: %s
 Description: %s
 Owner: %s
 Rounds: %s
 Hashed: %s
 StopEnroll: %s
 CurrentRound: %d`,
+		lottery.ID,
 		lottery.Title,
 		lottery.Description,
 		lottery.Owner,
@@ -49,6 +53,7 @@ CurrentRound: %d`,
 		strconv.FormatBool(lottery.StopEnroll),
 		lottery.CurrentRound))
 }
+
 // TODO: 还需要表示每轮抽中人数
 type Candidates []string
 

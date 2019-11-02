@@ -12,6 +12,8 @@ import (
 	"net/http"
 )
 
+var logger = util.GetLogger("lotteryservice")
+
 type createLotteryReq struct {
 	BaseReq     rest.BaseReq `json:"base_req"`
 	Rounds      string       `json:"rounds"`
@@ -57,9 +59,21 @@ func createLotteryHandler(cliCtx context.CLIContext) http.HandlerFunc {
 func getLotteryHandler(cliCtx context.CLIContext, storeName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		lotteryID := vars["lotteryID"]
-
+		lotteryID := vars[lotteryID]
+		logger.Info("receive lotteryID from rest request: " + lotteryID)
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/lottery/%s", storeName, lotteryID), nil)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
+
+func getLotteriesHandler(cliCtx context.CLIContext, storeName string) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/lotteries", storeName), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

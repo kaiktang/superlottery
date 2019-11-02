@@ -11,7 +11,8 @@ import (
 import abci "github.com/tendermint/tendermint/abci/types"
 
 const (
-	QueryLottery = "lottery"
+	QueryLottery   = "lottery"
+	QueryLotteries = "lotteries"
 )
 
 var logger = util.GetLogger("keeper")
@@ -22,10 +23,30 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		switch path[0] {
 		case QueryLottery:
 			return queryLottery(ctx, path[1:], req, keeper)
+		case QueryLotteries:
+			return queryLotteries(ctx, req, keeper)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown lotteryservice query endpoint")
 		}
 	}
+}
+
+func queryLotteries(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	var lotteries []types.Lottery
+
+	lotteryItr := keeper.GetLotteryIterator(ctx)
+	for ; lotteryItr.Valid(); lotteryItr.Next() {
+		var lottery types.Lottery
+		keeper.cdc.MustUnmarshalBinaryBare(lotteryItr.Value(), &lottery)
+		lotteries = append(lotteries, lottery)
+	}
+
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryLotteries(lotteries))
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return res, nil
 }
 
 func queryLottery(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
