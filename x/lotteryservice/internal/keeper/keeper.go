@@ -5,8 +5,10 @@ import (
 	"github.com/TomKKlalala/superchainer/x/lotteryservice/internal/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"math/rand"
 	"strconv"
 	"sync"
+	"time"
 )
 
 var lock sync.Mutex
@@ -52,6 +54,7 @@ func (k Keeper) CreateLottery(ctx sdk.Context, lottery *types.Lottery) string {
 
 	id := k.GetNextLotteryID(ctx)
 	lottery.ID = id
+	lottery.CreateTime = time.Now().Unix()
 	logger.Info("try to create: " + (types.LotteryPrefix + id) + "   " + (*lottery).String())
 	store.Set([]byte(types.LotteryPrefix+id), k.cdc.MustMarshalBinaryBare(lottery))
 
@@ -127,4 +130,73 @@ func (k Keeper) GetCandidates(ctx sdk.Context, lotteryID string) types.Candidate
 	}
 
 	return candidates
+}
+
+func (k Keeper) StartLottery(ctx sdk.Context, lotteryID string, sender sdk.AccAddress) sdk.Error {
+	lottery := k.GetLottery(ctx, lotteryID)
+	if !lottery.Owner.Equals(sender) {
+		return types.ErrPermissionError(types.DefaultCodespace)
+	}
+	if lottery.StopEnroll {
+		return types.ErrDoubleStart(types.DefaultCodespace)
+	}
+	totalWinner := 0
+	for i := 0; i < len(lottery.Rounds); i++ {
+		totalWinner += lottery.Rounds[i]
+	}
+
+	if lottery.CandidateNum < totalWinner {
+		return types.ErrNeedMoreCandidates(types.DefaultCodespace)
+	}
+
+	lottery.StopEnroll = true
+
+	// update lottery
+	k.SetLottery(ctx, lottery)
+
+	now := ctx.BlockTime().Unix()
+
+	seed := lottery.CreateTime + now
+
+	rand.Seed(seed)
+	seq := rand.Perm(lottery.CandidateNum)
+
+	winnerIDs := make([][]int, len(lottery.Rounds))
+	index := 0
+	for i := 0; i < len(lottery.Rounds); i++ {
+		winnerIDs[i] = make([]int, 0)
+		winnerIDs[i] = append(winnerIDs[i], seq[index:index+lottery.Rounds[i]]...)
+		index += lottery.Rounds[i]
+	}
+
+	// get identity by id
+	winners := make([][]string, len(lottery.Rounds))
+	for i := 0; i < len(winnerIDs); i++ {
+		winners[i] = make([]string, 0)
+		for j := 0; j < len(winnerIDs[i]); j++ {
+			winners[i] = append(winners[i], k.GetCandidate(ctx, strconv.Itoa(winnerIDs[i][j]), lotteryID))
+		}
+	}
+
+	store := ctx.KVStore(k.key)
+	// store winners
+	store.Set([]byte(types.LotteryResultPrefix+lottery.ID), k.cdc.MustMarshalBinaryBare(winners))
+
+	return nil
+}
+
+func (k Keeper) GetCandidate(ctx sdk.Context, candidateID string, lotteryID string) string {
+	store := ctx.KVStore(k.key)
+	bz := store.Get([]byte(types.LotteryCandidatesPrefix + lotteryID + "_" + candidateID))
+	return string(bz)
+}
+
+func (k Keeper) GetWinners(ctx sdk.Context, lotteryID string) [][]string {
+	store := ctx.KVStore(k.key)
+	bz := store.Get([]byte(types.LotteryResultPrefix + lotteryID))
+
+	var winners [][]string
+	k.cdc.MustUnmarshalBinaryBare(bz, &winners)
+
+	return winners
 }

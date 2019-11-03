@@ -18,6 +18,8 @@ type Lottery struct {
 	StopEnroll   bool           `json:"stopEnroll"`
 	CurrentRound int            `json:"currentRound"`
 	CandidateNum int            `json:"candidateNum"`
+	// for seeds
+	CreateTime int64 `json:"createTime"`
 }
 
 func NewLottery() Lottery {
@@ -34,7 +36,8 @@ Rounds: %s
 Hashed: %s
 StopEnroll: %s
 CurrentRound: %d
-CandidateNum:`,
+CandidateNum: %d
+CreateTime: %d`,
 		lottery.ID,
 		lottery.Title,
 		lottery.Description,
@@ -42,11 +45,12 @@ CandidateNum:`,
 		util.ArrayToString(lottery.Rounds, ","),
 		strconv.FormatBool(lottery.Hashed),
 		strconv.FormatBool(lottery.StopEnroll),
-		lottery.CurrentRound),
+		lottery.CurrentRound,
+		lottery.CandidateNum,
+		lottery.CreateTime),
 	)
 }
 
-// TODO: 还需要表示每轮抽中人数
 type Candidates []string
 
 func (c Candidates) String() string {

@@ -15,4 +15,5 @@ func init() {
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgCreateLottery{}, "lotteryservice/MsgCreateLottery", nil)
 	cdc.RegisterConcrete(MsgAddCandidates{}, "lotteryservice/MsgAddCandidates", nil)
+	cdc.RegisterConcrete(MsgStartLottery{}, "lotteryservice/MsgStartLottery", nil)
 }

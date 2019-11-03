@@ -20,6 +20,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 		case types.MsgAddCandidates:
 			logger.Info("receive msg MsgAddCandidates")
 			return handleAddCandidates(ctx, keeper, msg)
+		case types.MsgStartLottery:
+			return handleStartLottery(ctx, keeper, msg)
 		default:
 			errMsg := fmt.Sprintf("Unrecognized lotteryservice Msg type: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -50,5 +52,15 @@ func handleAddCandidates(ctx sdk.Context, keeper Keeper, msg types.MsgAddCandida
 	if err != nil {
 		return sdk.Result{Code: err.Code(), Codespace: err.Codespace()}
 	}
+	return sdk.Result{}
+}
+
+//TODO: 待完成
+func handleStartLottery(ctx sdk.Context, keeper Keeper, msg types.MsgStartLottery) sdk.Result {
+	err := keeper.StartLottery(ctx, msg.ID, msg.Sender)
+	if err != nil {
+		return sdk.Result{Code: err.Code(), Codespace: err.Codespace()}
+	}
+
 	return sdk.Result{}
 }

@@ -49,8 +49,8 @@ type MsgAddCandidates struct {
 	Sender     sdk.AccAddress `json:"sender"`
 }
 
-func NewMsgAddCandidates(id string, candidates Candidates, owner sdk.AccAddress) *MsgAddCandidates {
-	return &MsgAddCandidates{ID: id, Candidates: candidates, Sender: owner}
+func NewMsgAddCandidates(id string, candidates Candidates, sender sdk.AccAddress) *MsgAddCandidates {
+	return &MsgAddCandidates{ID: id, Candidates: candidates, Sender: sender}
 }
 
 // Route should return the name of the module
@@ -80,5 +80,41 @@ func (msg MsgAddCandidates) GetSignBytes() []byte {
 
 // GetSigners defines whose signature is required
 func (msg MsgAddCandidates) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Sender}
+}
+
+type MsgStartLottery struct {
+	ID     string         `json:"id"`
+	Sender sdk.AccAddress `json:"sender"`
+}
+
+func NewStartLottery(id string, sender sdk.AccAddress) *MsgStartLottery {
+	return &MsgStartLottery{ID: id, Sender: sender}
+}
+
+// Route should return the name of the module
+func (msg MsgStartLottery) Route() string { return RouterKey }
+
+// Type should return the action
+func (msg MsgStartLottery) Type() string { return "start_lottery" }
+
+// ValidateBasic runs stateless checks on the message
+func (msg MsgStartLottery) ValidateBasic() sdk.Error {
+	if len(msg.ID) == 0 {
+		return sdk.ErrInvalidAddress(msg.ID)
+	}
+	if msg.Sender.Empty() {
+		return sdk.ErrUnknownRequest("Sender cannot be empty")
+	}
+	return nil
+}
+
+// GetSignBytes encodes the message for signing
+func (msg MsgStartLottery) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+// GetSigners defines whose signature is required
+func (msg MsgStartLottery) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Sender}
 }

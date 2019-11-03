@@ -87,7 +87,21 @@ func getCandidatesHandler(cliCtx context.CLIContext, storeName string) func(http
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		lotteryID := vars[lotteryID]
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/lottery/candidates/%s", storeName, lotteryID), nil)
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/lottery/%s/candidates", storeName, lotteryID), nil)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
+
+func getWinnersHandler(cliCtx context.CLIContext, storeName string) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		lotteryID := vars[lotteryID]
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/lottery/%s/winners", storeName, lotteryID), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

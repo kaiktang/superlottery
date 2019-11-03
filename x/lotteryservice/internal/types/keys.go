@@ -9,4 +9,5 @@ const (
 	LotteryPrefix           = "lottery_"
 	LotteryIDKey            = "id"
 	LotteryCandidatesPrefix = "candidates_"
+	LotteryResultPrefix     = "result_"
 )

@@ -15,6 +15,5 @@ lscli config indent true
 lscli config trust-node true
 
 #lsd gentx --name jack
-
 #lsd collect-gentxs
 #lsd validate-genesis
