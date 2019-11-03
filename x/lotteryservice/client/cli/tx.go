@@ -53,7 +53,6 @@ func GetCmdCreateLottery(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			//TODO: 如何返回ID？
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}

@@ -32,7 +32,6 @@ func GetCmdGetLottery(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			id := args[0]
-			fmt.Println(fmt.Sprintf("custom/%s/lottery/%s", queryRoute, id))
 			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/lottery/%s", queryRoute, id), nil)
 			if err != nil {
 				fmt.Printf("could not find lottery: %s \n", id)

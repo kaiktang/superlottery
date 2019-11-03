@@ -42,9 +42,8 @@ func createLotteryHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		rounds := util.StringToArray(req.Rounds, ",")
-		// create the message
 
-		//TODO: 是否能够直接解析hashed为bool还是需要先string再转换
+		// create the message
 		msg := types.NewMsgCreateLottery(req.Title, req.Description, addr, rounds, req.Hashed)
 		err = msg.ValidateBasic()
 		if err != nil {

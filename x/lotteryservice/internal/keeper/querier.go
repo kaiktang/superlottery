@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"github.com/TomKKlalala/superchainer/util"
 	"github.com/TomKKlalala/superchainer/x/lotteryservice/internal/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -70,7 +69,6 @@ func queryLotteries(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 
 func queryLottery(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	lotteryID := path[0]
-	fmt.Println(fmt.Sprintf("lottery id: %s", lotteryID))
 	lottery := keeper.GetLottery(ctx, lotteryID)
 
 	if lottery == nil {

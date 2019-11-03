@@ -42,7 +42,6 @@ func handleMsgCreateLottery(ctx sdk.Context, keeper Keeper, msg types.MsgCreateL
 	}
 	lotteryID := keeper.CreateLottery(ctx, lottery)
 
-	//TODO: 是否能够正常返回？
 	return sdk.Result{Data: []byte(lotteryID)}
 }
 
@@ -55,7 +54,6 @@ func handleAddCandidates(ctx sdk.Context, keeper Keeper, msg types.MsgAddCandida
 	return sdk.Result{}
 }
 
-//TODO: 待完成
 func handleStartLottery(ctx sdk.Context, keeper Keeper, msg types.MsgStartLottery) sdk.Result {
 	err := keeper.StartLottery(ctx, msg.ID, msg.Sender)
 	if err != nil {
